@@ -1,8 +1,8 @@
-import os
+import streamlit as st
 from google import genai
 from app import get_finance_news
 
-client = genai.Client(api_key=os.getenv("GEMINI_API_KEY"))
+client = genai.Client(api_key=st.secrets["GEMINI_API_KEY"])
 
 
 def summarize_news(question, articles):
@@ -31,9 +31,7 @@ If no news is available, clearly say that no recent verified news was found.
 
 if __name__ == "__main__":
     question = input("Ask a finance question: ")
-
     articles = get_finance_news(question)
-
     answer = summarize_news(question, articles)
 
     print("\nAnswer:\n")
