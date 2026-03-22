@@ -5,19 +5,28 @@ from client import summarize_news
 st.set_page_config(page_title="Finance News Chatbot", page_icon="📈")
 
 st.title("Finance News Chatbot")
-st.write("Ask a finance-related question and get an answer based on recent news.")
+st.caption("Ask finance-related questions and get answers based on recent news.")
 
-with st.form("finance_form"):
-    question = st.text_input("Enter your question")
-    submitted = st.form_submit_button("Ask")
+if "messages" not in st.session_state:
+    st.session_state.messages = []
 
-if submitted:
-    if question.strip():
+for message in st.session_state.messages:
+    with st.chat_message(message["role"]):
+        st.markdown(message["content"])
+
+question = st.chat_input("Ask a question")
+
+if question:
+    st.session_state.messages.append({"role": "user", "content": question})
+
+    with st.chat_message("user"):
+        st.markdown(question)
+
+    with st.chat_message("assistant"):
         with st.spinner("Fetching news and generating answer..."):
             articles = get_finance_news(question)
             answer = summarize_news(question, articles)
 
-        st.subheader("Answer")
-        st.write(answer)
-    else:
-        st.warning("Please enter a question.")
+        st.markdown(answer)
+
+    st.session_state.messages.append({"role": "assistant", "content": answer})
