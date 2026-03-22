@@ -3,6 +3,7 @@ streamlit
 
 # ===== API calls =====
 requests
+google-genai
 
 # ===== Environment variables =====
 python-dotenv

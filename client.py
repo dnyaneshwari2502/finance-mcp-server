@@ -1,12 +1,11 @@
-import requests
+import os
+from google import genai
 from app import get_finance_news
 
-OLLAMA_URL = "http://localhost:11434/api/generate"
-MODEL_NAME = "llama3"
+client = genai.Client(api_key=os.getenv("GEMINI_API_KEY"))
 
 
 def summarize_news(question, articles):
-
     prompt = f"""
 You are a finance assistant.
 
@@ -14,28 +13,23 @@ A user asked this question:
 {question}
 
 Here are recent news articles:
-
 {articles}
 
 Summarize the key insights and answer the user's question based only on the news provided.
 Keep answers strictly up to 5-6 sentences.
 Include sources if relevant.
+If no news is available, clearly say that no recent verified news was found.
 """
 
-    payload = {
-        "model": MODEL_NAME,
-        "prompt": prompt,
-        "stream": False
-    }
+    response = client.models.generate_content(
+        model="gemini-1.5-flash",
+        contents=prompt
+    )
 
-    response = requests.post(OLLAMA_URL, json=payload)
-    response.raise_for_status()
-
-    return response.json()["response"]
+    return response.text
 
 
 if __name__ == "__main__":
-
     question = input("Ask a finance question: ")
 
     articles = get_finance_news(question)
