@@ -1,5 +1,6 @@
 import os
 import requests
+import streamlit as st
 from dotenv import load_dotenv
 from mcp.server.fastmcp import FastMCP
 
@@ -7,23 +8,31 @@ load_dotenv()
 
 mcp = FastMCP("finance-mcp-server")
 
-NEWS_API_KEY = os.getenv("NEWS_API_KEY")
 NEWS_API_URL = "https://newsapi.org/v2/everything"
+
+
+def get_news_api_key():
+    try:
+        return st.secrets["NEWS_API_KEY"]
+    except Exception:
+        return os.getenv("NEWS_API_KEY")
 
 
 @mcp.tool()
 def get_finance_news(topic: str) -> list:
     """Fetch recent finance-related news articles for a given topic."""
-    
-    if not NEWS_API_KEY:
-        return "Error: NEWS_API_KEY not found in .env file."
+
+    news_api_key = get_news_api_key()
+
+    if not news_api_key:
+        return []
 
     params = {
         "q": topic,
         "language": "en",
         "sortBy": "publishedAt",
         "pageSize": 5,
-        "apiKey": NEWS_API_KEY,
+        "apiKey": news_api_key,
     }
 
     try:
@@ -33,22 +42,23 @@ def get_finance_news(topic: str) -> list:
 
         articles = data.get("articles", [])
         if not articles:
-            return f"No recent news found for topic: {topic}"
+            return []
 
         results = []
-
         for article in articles:
-            results.append({
-                "title": article.get("title"),
-                "source": article.get("source", {}).get("name"),
-                "published_at": article.get("publishedAt"),
-                "url": article.get("url")
-            })
+            results.append(
+                {
+                    "title": article.get("title"),
+                    "source": article.get("source", {}).get("name"),
+                    "published_at": article.get("publishedAt"),
+                    "url": article.get("url"),
+                }
+            )
 
         return results
 
-    except requests.RequestException as e:
-        return f"Error fetching news: {str(e)}"
+    except requests.RequestException:
+        return []
 
 
 if __name__ == "__main__":
