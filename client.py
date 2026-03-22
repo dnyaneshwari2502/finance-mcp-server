@@ -21,12 +21,14 @@ Include sources if relevant.
 If no news is available, clearly say that no recent verified news was found.
 """
 
-    response = client.models.generate_content(
-        model="gemini-2.0-flash",
-        contents=prompt
-    )
-
-    return response.text
+    try:
+        response = client.models.generate_content(
+            model="gemini-2.0-flash",
+            contents=prompt
+        )
+        return response.text
+    except Exception as e:
+        return f"GEMINI ERROR: {str(e)}"
 
 
 if __name__ == "__main__":
