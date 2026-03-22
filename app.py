@@ -12,7 +12,7 @@ NEWS_API_URL = "https://newsapi.org/v2/everything"
 
 
 @mcp.tool()
-def get_finance_news(topic: str) -> str:
+def get_finance_news(topic: str) -> list:
     """Fetch recent finance-related news articles for a given topic."""
     
     if not NEWS_API_KEY:
@@ -36,20 +36,16 @@ def get_finance_news(topic: str) -> str:
             return f"No recent news found for topic: {topic}"
 
         results = []
+
         for article in articles:
-            title = article.get("title", "No title")
-            source = article.get("source", {}).get("name", "Unknown source")
-            published_at = article.get("publishedAt", "Unknown date")
-            url = article.get("url", "No URL")
+            results.append({
+                "title": article.get("title"),
+                "source": article.get("source", {}).get("name"),
+                "published_at": article.get("publishedAt"),
+                "url": article.get("url")
+            })
 
-            results.append(
-                f"Title: {title}\n"
-                f"Source: {source}\n"
-                f"Published At: {published_at}\n"
-                f"URL: {url}"
-            )
-
-        return "\n\n".join(results)
+        return results
 
     except requests.RequestException as e:
         return f"Error fetching news: {str(e)}"
