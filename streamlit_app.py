@@ -1,6 +1,8 @@
 import streamlit as st
 from app import get_finance_news
 from client import summarize_news
+import asyncio
+from client_mcp import ask_mcp_agent
 
 st.set_page_config(page_title="Finance News Chatbot", page_icon="📈")
 
@@ -24,8 +26,12 @@ if question:
 
     with st.chat_message("assistant"):
         with st.spinner("Fetching news and generating answer..."):
-            articles = get_finance_news(question)
-            answer = summarize_news(question, articles)
+            try:
+                answer = asyncio.run(ask_mcp_agent(question))
+            except Exception:
+                # fallback to existing method
+                articles = get_finance_news(question)
+                answer = summarize_news(question, articles)
 
         st.markdown(answer)
 

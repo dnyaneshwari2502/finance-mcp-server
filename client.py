@@ -1,8 +1,20 @@
-import streamlit as st
+import os
+from dotenv import load_dotenv
 from google import genai
 from app import get_finance_news
 
-client = genai.Client(api_key=st.secrets["GEMINI_API_KEY"])
+load_dotenv()
+
+
+def get_gemini_key():
+    try:
+        import streamlit as st
+        return st.secrets["GEMINI_API_KEY"]
+    except Exception:
+        return os.getenv("GEMINI_API_KEY")
+
+
+client = genai.Client(api_key=get_gemini_key())
 
 
 def summarize_news(question, articles):
