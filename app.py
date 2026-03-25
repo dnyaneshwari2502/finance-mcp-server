@@ -13,10 +13,12 @@ NEWS_API_URL = "https://newsapi.org/v2/everything"
 
 def get_news_api_key():
     try:
-        return st.secrets["NEWS_API_KEY"]
+        key = st.secrets["NEWS_API_KEY"]
     except Exception:
-        return os.getenv("NEWS_API_KEY")
+        key = os.getenv("NEWS_API_KEY")
 
+    print("DEBUG NEWS_API_KEY FOUND:", bool(key))
+    return key
 
 @mcp.tool()
 def get_finance_news(topic: str) -> list:
