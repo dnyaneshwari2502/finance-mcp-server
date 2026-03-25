@@ -10,8 +10,8 @@ This project is a finance-focused AI chatbot that answers user queries using rea
 
 - Takes a finance-related question from the user  
 - Fetches recent news articles using NewsAPI  
-- Sends the retrieved data to a Gemini LLM  
-- Returns a summarized, grounded answer  
+- Uses an LLM to generate answers grounded in real-time data  
+- Returns a concise summary based only on retrieved information  
 
 ---
 
@@ -21,13 +21,14 @@ This project is a finance-focused AI chatbot that answers user queries using rea
 - Streamlit (UI)  
 - Google Gemini API (LLM)  
 - NewsAPI (data source)  
-- MCP (tool structure)
+- MCP (Model Context Protocol)
 
 ---
 
 ## How it works
 
 User Question  
+→ MCP tool / direct function call  
 → News API fetch  
 → Articles retrieved  
 → Gemini summarization  
@@ -40,12 +41,33 @@ User Question
 - Chat-style UI (similar to ChatGPT)  
 - Real-time finance news retrieval  
 - LLM responses grounded in actual data  
+- Fallback mechanism for reliability  
 - Deployed web application  
 
 ---
 
-## MCP Integration (In Progress)
+## MCP Integration
 
-This project was initially structured using the Model Context Protocol (MCP) to define tools such as finance news retrieval. In the current deployed version, the tool is invoked directly within the application to ensure stability and simplicity for web deployment. I am currently working on extending this into a full MCP-based agent setup, where the LLM can dynamically decide when to call tools through an MCP client-server interaction.
+This project includes a working MCP-based setup where:
 
-## Author: Dnyaneshwari Rakshe
+- A tool (`get_finance_news`) is defined using MCP  
+- A client (`client_mcp.py`) communicates with the MCP server  
+- The tool fetches real-time data which is then passed to the LLM  
+
+For deployment stability, the Streamlit app currently uses a hybrid approach:
+- It first attempts MCP-based execution  
+- Falls back to direct function calls if needed  
+
+This ensures both reliability in production and demonstration of MCP architecture.
+
+---
+
+## Note
+
+This project was built as a personal learning project to explore LLM applications, tool integration, and real-time data grounding.
+
+---
+
+## Author
+
+Dnyaneshwari Rakshe
